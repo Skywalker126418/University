@@ -3,13 +3,15 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/database');
 const { successResponse, errorResponse } = require('../utils/responseHelper');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'ums_super_secret_jwt_key_2024_university_management_system';
+
 /**
  * Generate JWT token
  */
 const generateToken = (user) => {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role, name: `${user.first_name} ${user.last_name}` },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 };

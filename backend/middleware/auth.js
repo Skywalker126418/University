@@ -18,8 +18,10 @@ const authenticate = (req, res, next) => {
     return errorResponse(res, 'Access denied. Invalid token format.', 401);
   }
 
+const JWT_SECRET = process.env.JWT_SECRET || 'ums_super_secret_jwt_key_2024_university_management_system';
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {

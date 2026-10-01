@@ -23,8 +23,17 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // MySQL connection errors
-  if (err.code === 'ECONNREFUSED' || err.code === 'ER_ACCESS_DENIED_ERROR') {
-    return errorResponse(res, 'Database connection error.', 503);
+  if (
+    err.code === 'ECONNREFUSED' ||
+    err.code === 'ER_ACCESS_DENIED_ERROR' ||
+    err.code === 'ER_BAD_DB_ERROR' ||
+    err.code === 'PROTOCOL_CONNECTION_LOST' ||
+    err.code === 'ETIMEDOUT'
+  ) {
+    const detail = err.code === 'ER_BAD_DB_ERROR'
+      ? 'Database not found. Please ensure database/university_management_system.sql is imported.'
+      : 'Database connection error. Please ensure MySQL is running and credentials in .env are configured.';
+    return errorResponse(res, detail, 503);
   }
 
   // JWT errors
@@ -33,6 +42,9 @@ const errorHandler = (err, req, res, next) => {
   }
   if (err.name === 'TokenExpiredError') {
     return errorResponse(res, 'Token expired.', 401);
+  }
+  if (err.message && err.message.includes('secretOrPrivateKey')) {
+    return errorResponse(res, 'Authentication configuration error: JWT secret key is missing. Please set JWT_SECRET in .env.', 500);
   }
 
   // Validation errors (express-validator)

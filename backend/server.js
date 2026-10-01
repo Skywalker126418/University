@@ -1,4 +1,19 @@
-require('dotenv').config();
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Load environment variables from process cwd, backend directory, and root directory
+dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+// Provide safe development fallback for JWT_SECRET if missing
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'ums_super_secret_jwt_key_2024_university_management_system';
+}
+if (!process.env.JWT_EXPIRES_IN) {
+  process.env.JWT_EXPIRES_IN = '7d';
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -26,8 +41,6 @@ const roomRoutes = require('./routes/rooms');
 const attendanceRoutes = require('./routes/attendance');
 const academicYearRoutes = require('./routes/academicYears');
 const semesterRoutes = require('./routes/semesters');
-
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
